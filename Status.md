@@ -12,7 +12,20 @@ Here's the upgraded `status()` function with everything you need:
 import datetime
 import os
 
-def status(message, status_type="info", log_to_file=False, log_file=None):
+def status(message, status_type="info", log_to_file=False, log_file=None, level=0):
+    """
+    Prints a status message with an emoji, timestamp, and optional logging and indentation levels.
+
+    Args:
+        message (str or Exception): The message to display or an Exception object.
+        status_type (str): The type of status (e.g., "info", "success", "error").
+                           Determines the emoji used.
+        log_to_file (bool): If True, the message will also be written to a log file.
+        log_file (str): The path to the log file. Defaults to "status.log" if not
+                        provided and log_to_file is True.
+        level (int): The indentation level for the message. Each level adds a '|--' prefix.
+    """
+
     status_emojis = {
         "info": "ℹ️", "success": "✅", "error": "❌", "warning": "⚠️", "exception": "🔥",
         "loading": "⏳", "processing": "🔄", "refreshing": "🔁", "building": "🏗️",
@@ -47,13 +60,16 @@ def status(message, status_type="info", log_to_file=False, log_file=None):
     # Generate timestamp
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    # Generate indentation prefix
+    indentation = "|-" + ("-" * level * 2) if level > 0 else "" # Adjust 2 for desired spacing
+
     # Format message
     if isinstance(message, Exception):
         status_type = "exception"
-        output = f"{timestamp} {status_emojis.get(status_type)} Exception: {type(message).__name__}: {message}"
+        output = f"{timestamp} {indentation}{status_emojis.get(status_type)} Exception: {type(message).__name__}: {message}"
     else:
         emoji = status_emojis.get(status_type, "📍")
-        output = f"{timestamp} {emoji} {message}"
+        output = f"{timestamp} {indentation}{emoji} {message}"
 
     # Print to console
     print(output)
